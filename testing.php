@@ -34,7 +34,7 @@ $data = array(
 //    'body' => json_encode($data)
 //]);
 
-$response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers' .'?'. $debuggingQuerystring, [
+$response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers' . '?' . $debuggingQuerystring, [
     'body' => json_encode($data)
 ]);
 
@@ -42,6 +42,8 @@ $programmerUrl = $response->getHeader('Location');
 // 2) GET a programmer resource
 $response = $client->get($programmerUrl);
 
+// 3) GET a programmers collection resource
+$response = $client->get('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers/' . '?' . $debuggingQuerystring);
 
 echo $response;
 echo "\n\n";

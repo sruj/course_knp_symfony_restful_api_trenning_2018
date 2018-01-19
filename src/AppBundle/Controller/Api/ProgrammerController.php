@@ -8,6 +8,7 @@ use AppBundle\Form\ProgrammerType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,12 +28,15 @@ class ProgrammerController extends BaseController
         $em = $this->getDoctrine()->getManager();
         $em->persist($programmer);
         $em->flush();
-        $response = new Response('It worked. Believe me - I\'m an API', 201);
+
+        $data = $this->serializeProgrammer($programmer);
         $programmerUrl = $this->generateUrl(
             'api_programmers_show',
             ['nickname' => $programmer->getNickname()]
         );
-        $response->headers->set('Location',  $programmerUrl);
+        $response = new JsonResponse($data, 201);
+        $response->headers->set('Location', $programmerUrl);
+
         return $response;
     }
 
@@ -45,12 +49,40 @@ class ProgrammerController extends BaseController
             ->getRepository('AppBundle:Programmer')
             ->findOneByNickname($nickname);
 
-        $data = array(
+        $data = $this->serializeProgrammer($programmer);
+        $response = new JsonResponse($data, 200);
+
+        return $response;
+    }
+
+    /**
+     * @Route("/api/programmers/", name="api_programmers_list")
+     * @Method("GET")
+     */
+    public function listAction()
+    {
+        $programmers = $this->getDoctrine()
+            ->getRepository('AppBundle:Programmer')
+            ->findAll();
+
+        $data = ['programmers' => []];
+
+        foreach ($programmers as $programmer) {
+            $data['programmers'][] = $this->serializeProgrammer($programmer);
+        }
+
+        $response = new JsonResponse($data, 200);
+
+        return $response;
+    }
+
+    private function serializeProgrammer(Programmer $programmer)
+    {
+        return array(
             'nickname' => $programmer->getNickname(),
             'avatarNumber' => $programmer->getAvatarNumber(),
             'powerLevel' => $programmer->getPowerLevel(),
             'tagLine' => $programmer->getTagLine(),
         );
-        return new Response(json_encode($data), 200);
     }
 }
