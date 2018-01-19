@@ -51,7 +51,7 @@ class ApiTestCase extends KernelTestCase
         self::$staticClient->getEmitter()
             ->attach(self::$history);
 
-        self::bootKernel();
+        self::bootKernel(); //https://symfony.com/doc/3.4/testing/doctrine.html
     }
 
     protected function setUp()
