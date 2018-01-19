@@ -38,8 +38,9 @@ $response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.ph
     'body' => json_encode($data)
 ]);
 
+$programmerUrl = $response->getHeader('Location');
 // 2) GET a programmer resource
-$response = $client->get('/api/programmers/'.$nickname);
+$response = $client->get($programmerUrl);
 
 
 echo $response;
