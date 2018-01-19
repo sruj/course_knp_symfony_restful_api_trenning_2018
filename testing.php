@@ -29,6 +29,7 @@ $data = array(
     'tagLine' => 'a test dev!'
 );
 
+// 1) Create a programmer resource
 //$response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers', [
 //    'body' => json_encode($data)
 //]);
@@ -36,6 +37,10 @@ $data = array(
 $response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers' .'?'. $debuggingQuerystring, [
     'body' => json_encode($data)
 ]);
+
+// 2) GET a programmer resource
+$response = $client->get('/api/programmers/'.$nickname);
+
 
 echo $response;
 echo "\n\n";
