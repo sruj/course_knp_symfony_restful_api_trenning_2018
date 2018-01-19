@@ -2,7 +2,9 @@
 
 namespace AppBundle\Test;
 
+use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\ORM\EntityManager;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Message\AbstractMessage;
@@ -28,6 +30,11 @@ class ApiTestCase extends KernelTestCase
     protected $client;
 
     /**
+     * @var ConsoleOutput
+     */
+    private $output;
+
+    /**
      * @var FormatterHelper
      */
     private $formatterHelper;
@@ -35,7 +42,7 @@ class ApiTestCase extends KernelTestCase
     public static function setUpBeforeClass()
     {
         self::$staticClient = new Client([
-            'base_url' => 'http://localhost:8000',
+            'base_url' => 'http://localhost',
             'defaults' => [
                 'exceptions' => false
             ]
@@ -154,13 +161,6 @@ class ApiTestCase extends KernelTestCase
                     }
                 }
 
-                /*
-                 * When using the test environment, the profiler is not active
-                 * for performance. To help debug, turn it on temporarily in
-                 * the config_test.yml file:
-                 *   A) Update framework.profiler.collect to true
-                 *   B) Update web_profiler.toolbar to true
-                 */
                 $profilerUrl = $response->getHeader('X-Debug-Token-Link');
                 if ($profilerUrl) {
                     $fullProfilerUrl = $response->getHeader('Host').$profilerUrl;
@@ -186,7 +186,11 @@ class ApiTestCase extends KernelTestCase
      */
     protected function printDebug($string)
     {
-        echo $string."\n";
+        if ($this->output === null) {
+            $this->output = new ConsoleOutput();
+        }
+
+        $this->output->writeln($string);
     }
 
     /**
@@ -202,5 +206,29 @@ class ApiTestCase extends KernelTestCase
         $output = $this->formatterHelper->formatBlock($string, 'bg=red;fg=white', true);
 
         $this->printDebug($output);
+    }
+
+    protected function createUser($username, $plainPassword = 'foo')
+    {
+        $user = new User();
+        $user->setUsername($username);
+        $user->setEmail($username.'@foo.com');
+        $password = $this->getService('security.password_encoder')
+            ->encodePassword($user, $plainPassword);
+        $user->setPassword($password);
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $user;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getService('doctrine.orm.entity_manager');
     }
 }
