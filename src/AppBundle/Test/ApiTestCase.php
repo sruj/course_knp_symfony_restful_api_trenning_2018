@@ -62,7 +62,7 @@ class ApiTestCase extends KernelTestCase
             ->on('before', function(BeforeEvent $event) {
                 $path = $event->getRequest()->getPath();
                 if (strpos($path, '/api') === 0) {
-                    $event->getRequest()->setPath('/app_test.php'.$path);
+                    $event->getRequest()->setPath('/knp_Symfony_RESTful_API_Trenning_2018/web/app_test.php'.$path);
                 }
             });
 
