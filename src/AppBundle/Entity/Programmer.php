@@ -3,12 +3,15 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Programmer
  *
  * @ORM\Table(name="battle_programmer")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\ProgrammerRepository")
+ * @Serializer\ExclusionPolicy("all")
  */
 class Programmer
 {
@@ -25,6 +28,8 @@ class Programmer
      * @var string
      *
      * @ORM\Column(name="nickname", type="string", length=100, unique=true)
+     * @Serializer\Expose
+     * @Assert\NotBlank(message="Please enter a clever nickname")
      */
     private $nickname;
 
@@ -32,6 +37,7 @@ class Programmer
      * @var integer
      *
      * @ORM\Column(name="avatarNumber", type="integer")
+     * @Serializer\Expose
      */
     private $avatarNumber;
 
@@ -39,6 +45,7 @@ class Programmer
      * @var string
      *
      * @ORM\Column(name="tagLine", type="string", length=255, nullable=true)
+     * @Serializer\Expose
      */
     private $tagLine;
 
@@ -46,6 +53,7 @@ class Programmer
      * @var integer
      *
      * @ORM\Column(name="powerLevel", type="integer")
+     * @Serializer\Expose
      */
     private $powerLevel = 0;
 
@@ -64,7 +72,7 @@ class Programmer
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -87,7 +95,7 @@ class Programmer
     /**
      * Get nickname
      *
-     * @return string 
+     * @return string
      */
     public function getNickname()
     {
@@ -110,7 +118,7 @@ class Programmer
     /**
      * Get avatarNumber
      *
-     * @return integer 
+     * @return integer
      */
     public function getAvatarNumber()
     {
@@ -133,7 +141,7 @@ class Programmer
     /**
      * Get tagLine
      *
-     * @return string 
+     * @return string
      */
     public function getTagLine()
     {
@@ -156,7 +164,7 @@ class Programmer
     /**
      * Get powerLevel
      *
-     * @return integer 
+     * @return integer
      */
     public function getPowerLevel()
     {
