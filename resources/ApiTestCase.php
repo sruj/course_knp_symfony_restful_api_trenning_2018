@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Test;
+namespace AppBundle\Resources;
 
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Exception;
