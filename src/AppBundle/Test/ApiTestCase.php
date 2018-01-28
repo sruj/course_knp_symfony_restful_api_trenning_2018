@@ -2,11 +2,13 @@
 
 namespace AppBundle\Test;
 
+use AppBundle\Entity\Programmer;
 use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Message\AbstractMessage;
 use GuzzleHttp\Message\ResponseInterface;
 use GuzzleHttp\Subscriber\History;
@@ -14,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ApiTestCase extends KernelTestCase
 {
@@ -39,10 +42,13 @@ class ApiTestCase extends KernelTestCase
      */
     private $formatterHelper;
 
+    private $responseAsserter;
+
     public static function setUpBeforeClass()
     {
+        $baseUrl = getenv('TEST_BASE_URL');
         self::$staticClient = new Client([
-            'base_url' => 'http://localhost',
+            'base_url' => $baseUrl,
             'defaults' => [
                 'exceptions' => false
             ]
@@ -51,7 +57,16 @@ class ApiTestCase extends KernelTestCase
         self::$staticClient->getEmitter()
             ->attach(self::$history);
 
-        self::bootKernel(); //https://symfony.com/doc/3.4/testing/doctrine.html
+        // guaranteeing that /app_test.php is prefixed to all URLs
+        self::$staticClient->getEmitter()
+            ->on('before', function(BeforeEvent $event) {
+                $path = $event->getRequest()->getPath();
+                if (strpos($path, '/api') === 0) {
+                    $event->getRequest()->setPath('/app_test.php'.$path);
+                }
+            });
+
+        self::bootKernel();
     }
 
     protected function setUp()
@@ -85,7 +100,7 @@ class ApiTestCase extends KernelTestCase
 
     private function purgeDatabase()
     {
-        $purger = new ORMPurger($this->getService('doctrine.orm.default_entity_manager'));
+        $purger = new ORMPurger($this->getService('doctrine')->getManager());
         $purger->purge();
     }
 
@@ -161,6 +176,11 @@ class ApiTestCase extends KernelTestCase
                     }
                 }
 
+                /*
+                 * When using the test environment, the profiler is not active
+                 * for performance. To help debug, turn it on temporarily in
+                 * the config_test.yml file (framework.profiler.collect)
+                 */
                 $profilerUrl = $response->getHeader('X-Debug-Token-Link');
                 if ($profilerUrl) {
                     $fullProfilerUrl = $response->getHeader('Host').$profilerUrl;
@@ -222,6 +242,39 @@ class ApiTestCase extends KernelTestCase
         $em->flush();
 
         return $user;
+    }
+
+    protected function createProgrammer(array $data)
+    {
+        $data = array_merge(array(
+            'powerLevel' => rand(0, 10),
+            'user' => $this->getEntityManager()
+                ->getRepository('AppBundle:User')
+                ->findAny()
+        ), $data);
+
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $programmer = new Programmer();
+        foreach ($data as $key => $value) {
+            $accessor->setValue($programmer, $key, $value);
+        }
+
+        $this->getEntityManager()->persist($programmer);
+        $this->getEntityManager()->flush();
+
+        return $programmer;
+    }
+
+    /**
+     * @return ResponseAsserter
+     */
+    protected function asserter()
+    {
+        if ($this->responseAsserter === null) {
+            $this->responseAsserter = new ResponseAsserter();
+        }
+
+        return $this->responseAsserter;
     }
 
     /**
