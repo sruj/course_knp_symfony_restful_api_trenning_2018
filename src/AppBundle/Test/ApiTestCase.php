@@ -18,6 +18,9 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ *  Base class for all our API tests
+ */
 class ApiTestCase extends KernelTestCase
 {
     private static $staticClient;
@@ -65,7 +68,7 @@ class ApiTestCase extends KernelTestCase
                     $event->getRequest()->setPath('/knp_Symfony_RESTful_API_Trenning_2018/web/app_test.php'.$path);
                 }
             });
-
+//        The kernel is the heart of Symfony, and booting it basically just makes the service container available.
         self::bootKernel();
     }
 
@@ -78,12 +81,22 @@ class ApiTestCase extends KernelTestCase
 
     /**
      * Clean up Kernel usage in this test.
+     *
+     * "The whole point of that KernelTestCase base class is to set and boot that static $kernel property
+     * which has the container on it. Now normally, the base class actually shuts down the kernel in tearDown().
+     * What I'm doing - on purpose - is booting the kernel and creating the container just once per my whole
+     * test suite."
      */
     protected function tearDown()
     {
         // purposefully not calling parent class, which shuts down the kernel
     }
 
+    /**
+     * "PHPUnit calls it whenever a test fails.
+     * I'm using it to print out the last response so we can see what just happened.
+     * ... so you don't have to stare at a giant HTML page in your terminal."
+     */
     protected function onNotSuccessfulTest(Exception $e)
     {
         if (self::$history && $lastResponse = self::$history->getLastResponse()) {
