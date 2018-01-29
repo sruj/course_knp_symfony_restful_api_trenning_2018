@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Test;
+namespace AppBundle\Resources;
 
 use GuzzleHttp\Message\ResponseInterface;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
