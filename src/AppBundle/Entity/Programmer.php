@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Programmer
@@ -27,6 +28,7 @@ class Programmer
      * @var string
      *
      * @ORM\Column(name="nickname", type="string", length=100, unique=true)
+     * @Assert\NotBlank(message="Please enter a clever nickname")
      * @Serializer\Expose
      */
     private $nickname;
@@ -70,7 +72,7 @@ class Programmer
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -93,7 +95,7 @@ class Programmer
     /**
      * Get nickname
      *
-     * @return string 
+     * @return string
      */
     public function getNickname()
     {
@@ -116,7 +118,7 @@ class Programmer
     /**
      * Get avatarNumber
      *
-     * @return integer 
+     * @return integer
      */
     public function getAvatarNumber()
     {
@@ -139,7 +141,7 @@ class Programmer
     /**
      * Get tagLine
      *
-     * @return string 
+     * @return string
      */
     public function getTagLine()
     {
@@ -162,7 +164,7 @@ class Programmer
     /**
      * Get powerLevel
      *
-     * @return integer 
+     * @return integer
      */
     public function getPowerLevel()
     {

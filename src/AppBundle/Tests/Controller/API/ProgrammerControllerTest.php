@@ -21,7 +21,7 @@ class ProgrammerControllerTest extends ApiTestCase
         );
 
         // 1) Create a programmer resource
-        $response = $this->client->post('/api/programmers', [
+        $response = $this->client->post('/api/programmers'. '?' . $this->getDebugQuery(), [
             'body' => json_encode($data)
         ]);
 
