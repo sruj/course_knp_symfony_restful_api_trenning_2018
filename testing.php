@@ -26,7 +26,7 @@ $nickname = 'ObjectOrienter' . rand(0, 999);
 $data = array(
     'nickname' => $nickname,
     'avatarNumber' => 5,
-    'tagLine' => 'a test dev!'
+    'tagLine' => 'a test dev3!'
 );
 
 // 1) Create a programmer resource
@@ -34,9 +34,22 @@ $data = array(
 //    'body' => json_encode($data)
 //]);
 
-//$response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers' . '?' . $debuggingQuerystring, [
-//    'body' => json_encode($data)
-//]);
+
+
+
+
+//testValidationErrors
+$data = array(
+    'avatarNumber' => 2,
+    'tagLine' => 'I\'m from a test!'
+);
+$response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers' . '?' . $debuggingQuerystring, [
+    'body' => json_encode($data)
+]);
+
+
+
+
 
 //$programmerUrl = $response->getHeader('Location');
 //// 2) GET a programmer resource
