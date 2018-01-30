@@ -28,10 +28,6 @@ class ProgrammerController extends BaseController
         $form = $this->createForm(new ProgrammerType(), $programmer);
         $this->processForm($request, $form);
 
-        if (!$form->isValid()) {
-            $this->throwApiProblemValidationException($form);
-        }
-
         $programmer->setUser($this->findUserByUsername('weaverryan'));
 
         $em = $this->getDoctrine()->getManager();
@@ -105,10 +101,6 @@ class ProgrammerController extends BaseController
         $form = $this->createForm(new UpdateProgrammerType(), $programmer);
         $this->processForm($request, $form);
 
-        if (!$form->isValid()) {
-            $this->throwApiProblemValidationException($form);
-        }
-
         $em = $this->getDoctrine()->getManager();
         $em->persist($programmer);
         $em->flush();
@@ -143,11 +135,6 @@ class ProgrammerController extends BaseController
     private function processForm(Request $request, FormInterface $form)
     {
         $data = json_decode($request->getContent(), true);
-        if ($data === null) {
-            $apiProblem = new ApiProblem(400, ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT);
-
-            throw new ApiProblemException($apiProblem);
-        }
 
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
@@ -155,32 +142,11 @@ class ProgrammerController extends BaseController
 
     private function getErrorsFromForm(FormInterface $form)
     {
-        $errors = array();
-        foreach ($form->getErrors() as $error) {
-            $errors[] = $error->getMessage();
-        }
 
-        foreach ($form->all() as $childForm) {
-            if ($childForm instanceof FormInterface) {
-                if ($childErrors = $this->getErrorsFromForm($childForm)) {
-                    $errors[$childForm->getName()] = $childErrors;
-                }
-            }
-        }
-
-        return $errors;
     }
 
     private function throwApiProblemValidationException(FormInterface $form)
     {
-        $errors = $this->getErrorsFromForm($form);
 
-        $apiProblem = new ApiProblem(
-            400,
-            ApiProblem::TYPE_VALIDATION_ERROR
-        );
-        $apiProblem->set('errors', $errors);
-
-        throw new ApiProblemException($apiProblem);
     }
 }
