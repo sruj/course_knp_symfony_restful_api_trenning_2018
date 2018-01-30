@@ -62,10 +62,10 @@ class ApiTestCase extends KernelTestCase
 
         // guaranteeing that /app_test.php is prefixed to all URLs
         self::$staticClient->getEmitter()
-            ->on('before', function(BeforeEvent $event) {
+            ->on('before', function (BeforeEvent $event) {
                 $path = $event->getRequest()->getPath();
                 if (strpos($path, '/api') === 0) {
-                    $event->getRequest()->setPath('/knp_Symfony_RESTful_API_Trenning_2018/web/app_test.php'.$path);
+                    $event->getRequest()->setPath('/knp_Symfony_RESTful_API_Trenning_2018/web/app_test.php' . $path);
                 }
             });
 //        The kernel is the heart of Symfony, and booting it basically just makes the service container available.
@@ -137,7 +137,7 @@ class ApiTestCase extends KernelTestCase
     protected function debugResponse(ResponseInterface $response)
     {
         $this->printDebug(AbstractMessage::getStartLineAndHeaders($response));
-        $body = (string) $response->getBody();
+        $body = (string)$response->getBody();
 
         $contentType = $response->getHeader('Content-Type');
         if ($contentType == 'application/json' || strpos($contentType, '+json') !== false) {
@@ -196,7 +196,7 @@ class ApiTestCase extends KernelTestCase
                  */
                 $profilerUrl = $response->getHeader('X-Debug-Token-Link');
                 if ($profilerUrl) {
-                    $fullProfilerUrl = $response->getHeader('Host').$profilerUrl;
+                    $fullProfilerUrl = $response->getHeader('Host') . $profilerUrl;
                     $this->printDebug('');
                     $this->printDebug(sprintf(
                         'Profiler URL: <comment>%s</comment>',
@@ -245,7 +245,7 @@ class ApiTestCase extends KernelTestCase
     {
         $user = new User();
         $user->setUsername($username);
-        $user->setEmail($username.'@foo.com');
+        $user->setEmail($username . '@foo.com');
         $password = $this->getService('security.password_encoder')
             ->encodePassword($user, $plainPassword);
         $user->setPassword($password);
@@ -296,5 +296,24 @@ class ApiTestCase extends KernelTestCase
     protected function getEntityManager()
     {
         return $this->getService('doctrine.orm.entity_manager');
+    }
+
+    protected function getDebugQuery()
+    {
+        $debuggingQuerystring = '';
+        if (isset($_GET['XDEBUG_SESSION_START'])) { // xdebug
+            $debuggingQuerystring = 'XDEBUG_SESSION_START=' . $_GET['XDEBUG_SESSION_START'];
+        }
+        if (isset($_COOKIE['XDEBUG_SESSION'])) { // xdebug (cookie)
+            $debuggingQuerystring = 'XDEBUG_SESSION_START=PHPSTORM';
+        }
+        if (isset($_GET['start_debug'])) { // zend debugger
+            $debuggingQuerystring = 'start_debug=' . $_GET['start_debug'];
+        }
+        if (empty($debuggingQuerystring)) {
+            $debuggingQuerystring = 'XDEBUG_SESSION_START=PHPSTORM';
+        }
+
+        return $debuggingQuerystring;
     }
 }
