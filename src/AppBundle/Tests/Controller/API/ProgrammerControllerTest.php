@@ -2,6 +2,8 @@
 namespace AppBundle\Tests\Controller\Api;
 
 use AppBundle\Test\ApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProgrammerControllerTest extends ApiTestCase
 {
@@ -127,10 +129,12 @@ class ProgrammerControllerTest extends ApiTestCase
             'avatarNumber' => 2,
             'tagLine' => 'I\'m from a test!'
         );
+
         // 1) Create a programmer resource
         $response = $this->client->post('/api/programmers', [
             'body' => json_encode($data)
         ]);
+
         $this->assertEquals(400, $response->getStatusCode());
         $this->asserter()->assertResponsePropertiesExist($response, array(
             'type',
@@ -140,5 +144,35 @@ class ProgrammerControllerTest extends ApiTestCase
         $this->asserter()->assertResponsePropertyExists($response, 'errors.nickname');
         $this->asserter()->assertResponsePropertyEquals($response, 'errors.nickname[0]', 'Please enter a clever nickname');
         $this->asserter()->assertResponsePropertyDoesNotExist($response, 'errors.avatarNumber');
+        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
+    }
+
+    public function testInvalidJson()
+    {
+        $invalidBody = <<<EOF
+{
+    "nickname": "JohnnyRobot",
+    "avatarNumber" : "2
+    "tagLine": "I'm from a test!"
+}
+EOF;
+
+        $response = $this->client->post('/api/programmers', [
+            'body' => $invalidBody
+        ]);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->asserter()->assertResponsePropertyContains($response, 'type', 'invalid_body_format');
+    }
+
+    public function test404Exception()
+    {
+        $response = $this->client->get('/api/programmers/fake');
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
+        $this->asserter()->assertResponsePropertyEquals($response, 'type', 'about:blank');
+        $this->asserter()->assertResponsePropertyEquals($response, 'title', 'Not Found');
+        $this->asserter()->assertResponsePropertyEquals($response, 'detail', 'No programmer found with nickname "fake"');
     }
 }
