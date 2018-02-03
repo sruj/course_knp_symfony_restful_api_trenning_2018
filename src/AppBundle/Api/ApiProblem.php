@@ -16,12 +16,14 @@ class ApiProblem
     private $message;
 
     const VALIDATION_TYPE = 'validation_error';
+    const INVALID_BODY_FORMAT_TYPE = 'invalid_body_format';
 
     private $titles = [
-        self::VALIDATION_TYPE => 'There wa a validation error',
+        self::VALIDATION_TYPE => 'There was a validation error',
+        self::INVALID_BODY_FORMAT_TYPE => 'There was an error in passing data',
     ];
 
-    public function __construct($statusCode, $type = null, $errors)
+    public function __construct($statusCode, $type = null, $errors = null)
     {
         $this->statusCode = $statusCode;
         $this->title = $this->titles[$type];

@@ -122,31 +122,26 @@ class ProgrammerControllerTest extends ApiTestCase
 //        $response = $this->client->delete('/api/programmers/UnitTester');
 //        $this->assertEquals(204, $response->getStatusCode());
 //    }
-
-    public function testValidationErrors()
-    {
-        $data = array(
-            'avatarNumber' => 2,
-            'tagLine' => 'I\'m from a test!'
-        );
-
-        // 1) Create a programmer resource
-        $response = $this->client->post('/api/programmers'. '?' . $this->getDebugQuery(), [
-            'body' => json_encode($data)
-        ]);
-
-        $this->assertEquals(422, $response->getStatusCode());
-        $this->asserter()->assertResponsePropertiesExist($response, array(
-            'type',
-            'title',
-            'errors',
-        ));
-        $this->asserter()->assertResponsePropertyExists($response, 'errors.nickname');
-        $this->asserter()->assertResponsePropertyEquals($response, 'errors.nickname[0]', 'Please enter a clever nickname');
-        $this->asserter()->assertResponsePropertyDoesNotExist($response, 'errors.avatarNumber');
-        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
-    }
-
+//
+//    public function testValidationErrors()
+//    {
+//        $data = array(
+//            'avatarNumber' => 2,
+//            'tagLine' => 'I\'m from a test!'
+//        );
+//
+//        $response = $this->client->post('/api/programmers'. '?' . $this->getDebugQuery(), [
+//            'body' => json_encode($data)
+//        ]);
+//
+//        $this->assertEquals(422, $response->getStatusCode());
+//        $this->asserter()->assertResponsePropertiesExist($response, ['type','title','errors']);
+//        $this->asserter()->assertResponsePropertyExists($response, 'errors.nickname');
+//        $this->asserter()->assertResponsePropertyEquals($response, 'errors.nickname[0]', 'Please enter a clever nickname');
+//        $this->asserter()->assertResponsePropertyDoesNotExist($response, 'errors.avatarNumber');
+//        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
+//    }
+//
 //    public function testInvalidJson()
 //    {
 //        $invalidBody = <<<EOF
@@ -157,22 +152,22 @@ class ProgrammerControllerTest extends ApiTestCase
 //}
 //EOF;
 //
-//        $response = $this->client->post('/api/programmers', [
+//        $response = $this->client->post('/api/programmers'. '?' . $this->getDebugQuery(), [
 //            'body' => $invalidBody
 //        ]);
 //
 //        $this->assertEquals(400, $response->getStatusCode());
 //        $this->asserter()->assertResponsePropertyContains($response, 'type', 'invalid_body_format');
 //    }
-//
-//    public function test404Exception()
-//    {
-//        $response = $this->client->get('/api/programmers/fake');
-//
-//        $this->assertEquals(404, $response->getStatusCode());
-//        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
-//        $this->asserter()->assertResponsePropertyEquals($response, 'type', 'about:blank');
-//        $this->asserter()->assertResponsePropertyEquals($response, 'title', 'Not Found');
-//        $this->asserter()->assertResponsePropertyEquals($response, 'detail', 'No programmer found with nickname "fake"');
-//    }
+
+    public function test404Exception()
+    {
+        $response = $this->client->get('/api/programmers/fake');
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));
+        $this->asserter()->assertResponsePropertyEquals($response, 'type', 'about:blank');
+        $this->asserter()->assertResponsePropertyEquals($response, 'title', 'Not Found');
+        $this->asserter()->assertResponsePropertyEquals($response, 'detail', 'No programmer found with nickname "fake"');
+    }
 }

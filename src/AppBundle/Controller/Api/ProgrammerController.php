@@ -150,6 +150,10 @@ class ProgrammerController extends BaseController
     private function processForm(Request $request, FormInterface $form)
     {
         $data = json_decode($request->getContent(), true);
+        if (empty($data)) {
+            $apiProblem = new ApiProblem(400, ApiProblem::INVALID_BODY_FORMAT_TYPE);
+            throw new ApiProblemException($apiProblem);
+        }
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
     }
