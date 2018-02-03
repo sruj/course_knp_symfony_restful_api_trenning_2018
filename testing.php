@@ -57,7 +57,7 @@ $response = $client->post('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.ph
 //
 // 3) GET a programmers collection resource
 //$response = $client->get('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers/' . '?' . $debuggingQuerystring);
-$response = $client->get('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers');
+//$response = $client->get('/knp_Symfony_RESTful_API_Trenning_2018/web/app_dev.php/api/programmers');
 
 echo $response;
 echo "\n\n";

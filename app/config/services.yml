@@ -16,3 +16,8 @@ services:
     battle.power_manager:
         class: AppBundle\Battle\PowerManager
         arguments: ['@doctrine.orm.entity_manager']
+
+    app.exception_listener:
+        class: AppBundle\EventListener\ExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

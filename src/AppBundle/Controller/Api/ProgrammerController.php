@@ -28,6 +28,21 @@ class ProgrammerController extends BaseController
         $form = $this->createForm(new ProgrammerType(), $programmer);
         $this->processForm($request, $form);
 
+        if (!$form->isValid()) {
+            $err = $form->getErrors();
+            $errors = array();
+            foreach ($err as $item) {
+                $errors['main'][] = $item->getMessage();
+            }
+            foreach ($form->all() as $key => $value) {
+                foreach ($value->getErrors() as $error) {
+                    $errors[$key][] = $error->getMessage();
+                }
+            }
+            $apiProblem = new ApiProblem(422, ApiProblem::VALIDATION_TYPE, $errors);
+            throw new ApiProblemException($apiProblem);
+        }
+
         $programmer->setUser($this->findUserByUsername('weaverryan'));
 
         $em = $this->getDoctrine()->getManager();
@@ -135,7 +150,6 @@ class ProgrammerController extends BaseController
     private function processForm(Request $request, FormInterface $form)
     {
         $data = json_decode($request->getContent(), true);
-
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
     }
