@@ -29,16 +29,7 @@ class ProgrammerController extends BaseController
         $this->processForm($request, $form);
 
         if (!$form->isValid()) {
-            $err = $form->getErrors();
-            $errors = array();
-            foreach ($err as $item) {
-                $errors['main'][] = $item->getMessage();
-            }
-            foreach ($form->all() as $key => $value) {
-                foreach ($value->getErrors() as $error) {
-                    $errors[$key][] = $error->getMessage();
-                }
-            }
+            $errors = $this->getErrorsFromForm($form);
             $apiProblem = new ApiProblem(422, ApiProblem::VALIDATION_TYPE, $errors);
             throw new ApiProblemException($apiProblem);
         }
@@ -158,13 +149,22 @@ class ProgrammerController extends BaseController
         $form->submit($data, $clearMissing);
     }
 
+    /**
+     * @param $form
+     * @return array
+     */
     private function getErrorsFromForm(FormInterface $form)
     {
-
-    }
-
-    private function throwApiProblemValidationException(FormInterface $form)
-    {
-
+        $err = $form->getErrors();
+        $errors = array();
+        foreach ($err as $item) {
+            $errors['main'][] = $item->getMessage();
+        }
+        foreach ($form->all() as $key => $value) {
+            foreach ($value->getErrors() as $error) {
+                $errors[$key][] = $error->getMessage();
+            }
+        }
+        return $errors;
     }
 }
