@@ -62,4 +62,9 @@ class ApiProblem
         return $this->message;
     }
 
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
 }
