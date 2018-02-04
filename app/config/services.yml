@@ -19,5 +19,6 @@ services:
 
     app.exception_listener:
         class: AppBundle\EventListener\ExceptionListener
+        arguments: ['%kernel.debug%']
         tags:
             - { name: kernel.event_listener, event: kernel.exception }

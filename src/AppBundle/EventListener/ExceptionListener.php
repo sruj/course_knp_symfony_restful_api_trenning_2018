@@ -10,9 +10,32 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ExceptionListener
 {
+    private $debug;
+
+    public function __construct($debug)
+    {
+        $this->debug = $debug;
+    }
+
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
+
+        $statusCode = $exception instanceof HttpExceptionInterface ? $exception->getStatusCode() : 500;
+
+        // allow 500 errors to be thrown
+        if ($this->debug && $statusCode >= 500) {
+            return;
+        }
+
+        if (!$exception instanceof ApiProblemException) {
+            return;
+        }
+
+        if (strpos($event->getRequest()->getPathInfo(), '/api') !== 0) {
+            return;
+        }
+
         if ($exception instanceof ApiProblemException) {
             $response = null;
             $apiProblem = $exception->getApiProblem();
