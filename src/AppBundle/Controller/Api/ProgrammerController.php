@@ -61,10 +61,9 @@ class ProgrammerController extends BaseController
             ->findOneByNickname($nickname);
 
         if (!$programmer) {
-            throw $this->createNotFoundException(sprintf(
-                'No programmer found with nickname "%s"',
-                $nickname
-            ));
+            $detail = 'No programmer found with nickname "' . $nickname . '"';
+            $apiProblem = new ApiProblem(404, null, null, $detail);
+            throw new ApiProblemException($apiProblem);
         }
 
         $response = $this->createApiResponse($programmer, 200);

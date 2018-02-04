@@ -162,7 +162,7 @@ class ProgrammerControllerTest extends ApiTestCase
 
     public function test404Exception()
     {
-        $response = $this->client->get('/api/programmers/fake');
+        $response = $this->client->get('/api/programmers/fake'. '?' . $this->getDebugQuery());
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals('application/problem+json', $response->getHeader('Content-Type'));

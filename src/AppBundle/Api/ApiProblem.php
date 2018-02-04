@@ -14,6 +14,7 @@ class ApiProblem
     private $statusCode;
     private $errors;
     private $message;
+    private $detail;
 
     const VALIDATION_TYPE = 'validation_error';
     const INVALID_BODY_FORMAT_TYPE = 'invalid_body_format';
@@ -23,12 +24,18 @@ class ApiProblem
         self::INVALID_BODY_FORMAT_TYPE => 'There was an error in passing data',
     ];
 
-    public function __construct($statusCode, $type = null, $errors = null)
+    public function __construct($statusCode, $type = null, $errors = null, $detail = null)
     {
         $this->statusCode = $statusCode;
-        $this->title = $this->titles[$type];
-        $this->type = $type;
         $this->errors['errors'] = $errors;
+        $this->detail = $detail;
+        if (empty($type)) {
+            $this->type = 'about:blank';
+            $this->title = Response::$statusTexts[$statusCode];
+        } else {
+            $this->title = $this->titles[$type];
+            $this->type = $type;
+        }
 
         $this->prepareMessage();
     }
@@ -38,6 +45,7 @@ class ApiProblem
         $message = [
             'type' => $this->type,
             'title' => $this->title,
+            'detail' => $this->detail,
         ];
         $json = json_encode(array_merge($message, $this->errors));
 
